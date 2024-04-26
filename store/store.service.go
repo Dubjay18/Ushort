@@ -35,8 +35,8 @@ const CacheDuration = 6 * time.Hour
 // Initializing the store service and return a store pointer
 func (s StorageService) Init() *StorageService {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
+		Addr:     "redis-18402.c10.us-east-1-2.ec2.redns.redis-cloud.com:18402",
+		Password: "AOJ3POcDntTGXwofilBM1uUTdvuYAyZV",
 		DB:       0,
 	})
 
@@ -46,6 +46,7 @@ func (s StorageService) Init() *StorageService {
 	}
 
 	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
+	fmt.Printf("\nRedis client: %v\n", redisClient)
 	storeService.redisClient = redisClient
 	return storeService
 }
@@ -58,4 +59,14 @@ func (s StorageService) Save(shortUrl string, originalUrl string, userId string)
 		return err
 	}
 	return nil
+}
+
+// Retrieve the original URL from the Redis cache
+func (s StorageService) Get(shortUrl string) (string, error) {
+	val, err := s.redisClient.Get(ctx, shortUrl).Result()
+	if err != nil {
+		panic(fmt.Sprintf("Failed retrieving key url | Error: %v - shortUrl: %s\n", err, shortUrl))
+		return "", err
+	}
+	return val, nil
 }
