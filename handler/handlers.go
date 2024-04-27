@@ -15,7 +15,10 @@ func CreateShortUrl(c *gin.Context) {
 	// Bind the incoming JSON to a UrlCreationRequest struct.
 	var creationRequest dto.UrlCreationRequest
 	if err := c.ShouldBindJSON(&creationRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Message: "Invalid request",
+			Error:   err.Error(),
+		})
 		return
 	}
 	// Create a new URL shortener.
@@ -28,7 +31,10 @@ func CreateShortUrl(c *gin.Context) {
 	err := store.StoreService.Save(shortUrl, creationRequest.LongUrl)
 	if err != nil {
 		fmt.Printf("Error saving URL: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Message: "Error saving URL",
+			Error:   err.Error(),
+		})
 		return
 	}
 
@@ -39,9 +45,9 @@ func CreateShortUrl(c *gin.Context) {
 		protocol = "https"
 	}
 	// Respond with the short URL.
-	c.JSON(200, gin.H{
-		"message":   "short url created successfully",
-		"short_url": fmt.Sprintf("%s://%s/%s", protocol, host, shortUrl),
+	c.JSON(200, dto.UrlCreationResponse{
+		Message:  "Short URL created successfully",
+		ShortUrl: fmt.Sprintf("%s://%s/%s", protocol, host, shortUrl),
 	})
 }
 
@@ -54,7 +60,10 @@ func HandleShortUrlRedirect(c *gin.Context) {
 	initialUrl, err := store.StoreService.Get(shortUrl)
 	if err != nil {
 		fmt.Printf("Error retrieving URL: %v", err)
-		c.JSON(http.StatusNotFound, gin.H{"error": "URL not found"})
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Message: "URL not found",
+			Error:   err.Error(),
+		})
 		return
 	}
 	// Redirect to the long URL.
