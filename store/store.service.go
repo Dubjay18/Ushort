@@ -52,7 +52,7 @@ func (s StorageService) Init() *StorageService {
 }
 
 // Save the short URL and original URL in the Redis cache
-func (s StorageService) Save(shortUrl string, originalUrl string, userId string) error {
+func (s StorageService) Save(shortUrl string, originalUrl string) error {
 	err := s.redisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
 	if err != nil {
 		panic(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s\n", err, shortUrl, originalUrl))
@@ -69,10 +69,4 @@ func (s StorageService) Get(shortUrl string) (string, error) {
 		return "", err
 	}
 	return val, nil
-}
-
-func GetStore() Storage {
-	storeInit := StorageService{}
-	storeInit.Init()
-	return storeInit
 }

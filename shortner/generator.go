@@ -12,7 +12,7 @@ type Generator struct {
 }
 
 type ShortLinkGenerator interface {
-	GenerateShortLink(initialLink string, userId string) string
+	GenerateShortLink(initialLink string) string
 }
 
 func NewGenerator() *Generator {
@@ -20,8 +20,8 @@ func NewGenerator() *Generator {
 
 }
 
-func (g *Generator) GenerateShortLink(initialLink string, userId string) string {
-	urlHashBytes := sha256Of(initialLink + userId)
+func (g *Generator) GenerateShortLink(initialLink string) string {
+	urlHashBytes := sha256Of(initialLink + "jay")
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 	finalString := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
 	return finalString[:8]

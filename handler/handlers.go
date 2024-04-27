@@ -17,9 +17,9 @@ func CreateShortUrl(c *gin.Context) {
 	}
 	NewShortener := shortener.NewGenerator()
 
-	shortUrl := NewShortener.GenerateShortLink(creationRequest.LongUrl, creationRequest.UserId)
+	shortUrl := NewShortener.GenerateShortLink(creationRequest.LongUrl)
 
-	err := store.StoreService.Save(shortUrl, creationRequest.LongUrl, creationRequest.UserId)
+	err := store.StoreService.Save(shortUrl, creationRequest.LongUrl)
 	if err != nil {
 		fmt.Printf("Error saving URL: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
