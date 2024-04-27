@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"os"
 	"time"
 )
 
@@ -32,8 +33,8 @@ const CacheDuration = 6 * time.Hour
 // Init method initializes the storage service and returns a pointer to the storage service.
 func (s StorageService) Init() *StorageService {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "redis-18402.c10.us-east-1-2.ec2.redns.redis-cloud.com:18402",
-		Password: "AOJ3POcDntTGXwofilBM1uUTdvuYAyZV",
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASS"),
 		DB:       0,
 	})
 

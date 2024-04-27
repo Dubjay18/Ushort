@@ -5,9 +5,22 @@ import (
 	"github.com/Dubjay18/Ushort/handler"
 	"github.com/Dubjay18/Ushort/store"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
+func getVars() {
+	// Get the environment variables
+
+	err := godotenv.Load()
+
+	if err != nil {
+		println("Error loading .env file")
+	}
+
+}
+
 func main() {
+	getVars()
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
