@@ -1,38 +1,35 @@
+// Package store provides the storage layer for the application.
 package store
 
 import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-
 	"time"
 )
 
+// Storage interface defines the methods that our storage service must implement.
 type Storage interface {
 	Init() *StorageService
-	Save(shortUrl string, originalUrl string, userId string) error
+	Save(shortUrl string, originalUrl string) error
 	Get(shortUrl string) (string, error)
 }
 
-// Define the struct wrapper around raw Redis client
+// StorageService struct is a wrapper around the raw Redis client.
 type StorageService struct {
 	redisClient *redis.Client
 }
 
-// Top level declarations for the StoreService and Redis context
+// Top level declarations for the StoreService and Redis context.
 var (
-	StoreService = &StorageService{}
-	ctx          = context.Background()
+	StoreService = &StorageService{}    // Singleton instance of StorageService.
+	ctx          = context.Background() // Context for Redis operations.
 )
 
-// Note that in a real world usage, the cache duration shouldn't have
-// an expiration time, an LRU policy config should be set where the
-// values that are retrieved less often are purged automatically from
-// the cache and stored back in RDBMS whenever the cache is full
-
+// CacheDuration is the duration for which the data will be cached in Redis.
 const CacheDuration = 6 * time.Hour
 
-// Initializing the store service and return a store pointer
+// Init method initializes the storage service and returns a pointer to the storage service.
 func (s StorageService) Init() *StorageService {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "redis-18402.c10.us-east-1-2.ec2.redns.redis-cloud.com:18402",
@@ -51,7 +48,7 @@ func (s StorageService) Init() *StorageService {
 	return StoreService
 }
 
-// Save the short URL and original URL in the Redis cache
+// Save method saves the short URL and original URL in the Redis cache.
 func (s StorageService) Save(shortUrl string, originalUrl string) error {
 	err := s.redisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
 	if err != nil {
@@ -61,7 +58,7 @@ func (s StorageService) Save(shortUrl string, originalUrl string) error {
 	return nil
 }
 
-// Retrieve the original URL from the Redis cache
+// Get method retrieves the original URL from the Redis cache using the short URL.
 func (s StorageService) Get(shortUrl string) (string, error) {
 	val, err := s.redisClient.Get(ctx, shortUrl).Result()
 	if err != nil {
