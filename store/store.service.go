@@ -19,9 +19,9 @@ type StorageService struct {
 	redisClient *redis.Client
 }
 
-// Top level declarations for the storeService and Redis context
+// Top level declarations for the StoreService and Redis context
 var (
-	storeService = &StorageService{}
+	StoreService = &StorageService{}
 	ctx          = context.Background()
 )
 
@@ -47,8 +47,8 @@ func (s StorageService) Init() *StorageService {
 
 	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
 	fmt.Printf("\nRedis client: %v\n", redisClient)
-	storeService.redisClient = redisClient
-	return storeService
+	StoreService.redisClient = redisClient
+	return StoreService
 }
 
 // Save the short URL and original URL in the Redis cache
@@ -69,4 +69,10 @@ func (s StorageService) Get(shortUrl string) (string, error) {
 		return "", err
 	}
 	return val, nil
+}
+
+func GetStore() Storage {
+	storeInit := StorageService{}
+	storeInit.Init()
+	return storeInit
 }
