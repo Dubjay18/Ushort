@@ -1,6 +1,5 @@
-Sure, here's a basic README.md for your project:
 
-```markdown
+
 # Ushort
 
 Ushort is a URL shortening service written in Go. It uses Redis as a cache to store the short URL and original URL.
