@@ -4,9 +4,29 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/itchyny/base58-go"
+	"math/big"
 	"os"
 )
 
+type Generator struct {
+}
+
+type ShortLinkGenerator interface {
+	GenerateShortLink(initialLink string, userId string) string
+}
+
+func NewGenerator() *Generator {
+	return &Generator{}
+
+}
+
+func (g *Generator) GenerateShortLink(initialLink string, userId string) string {
+	urlHashBytes := sha256Of(initialLink + userId)
+	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
+	finalString := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+	return finalString[:8]
+
+}
 func sha256Of(input string) []byte {
 	algorithm := sha256.New()
 	algorithm.Write([]byte(input))
