@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/Dubjay18/Ushort/handler"
-	"github.com/Dubjay18/Ushort/store"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -22,6 +21,7 @@ func getVars() {
 func main() {
 	getVars()
 	r := gin.Default()
+	r.Use(CORS())
 	r.GET("/", func(c *gin.Context) {
 		handler.IndexPageHandler(c)
 	})
@@ -34,12 +34,26 @@ func main() {
 		handler.HandleShortUrlRedirect(c)
 	})
 
-	// Note that store initialization happens here
-	store.StoreService.Init()
+	//// Note that store initialization happens here
+	//store.StoreService.Init()
 
-	err := r.Run(":9808")
+	err := r.Run(":3000")
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start the web server - Error: %v", err))
 	}
 
+}
+
+func CORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }

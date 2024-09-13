@@ -18,6 +18,7 @@ func render(ctx *gin.Context, status int, template templ.Component) error {
 }
 
 func IndexPageHandler(c *gin.Context) {
+	fmt.Printf("IndexPageHandler\n")
 	render(c, http.StatusOK, views.Index())
 }
 
