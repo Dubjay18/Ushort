@@ -3,6 +3,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/Dubjay18/Ushort/database"
 	"github.com/Dubjay18/Ushort/dto"
 	shortener "github.com/Dubjay18/Ushort/shortner"
 	"github.com/Dubjay18/Ushort/store"
@@ -23,27 +24,61 @@ func IndexPageHandler(c *gin.Context) {
 }
 
 // CreateShortUrl is a handler function that creates a short URL from a given long URL.
-func CreateShortUrl(c *gin.Context) {
+func CreateShortUrl(c *gin.Context, st *database.Service) {
 	// Bind the incoming JSON to a UrlCreationRequest struct.
-	var creationRequest dto.UrlCreationRequest
+	var creationRequest *dto.UrlCreationRequest
 	if err := c.ShouldBindJSON(&creationRequest); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Message: "Invalid request",
-			Error:   err.Error(),
+		// If JSON binding fails, try binding form data.
+		longUrl := c.PostForm("url")
+		if longUrl == "" {
+			c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Message: "Invalid request",
+				Error:   err.Error(),
+			})
+			return
+		}
+		// Create a new URL shortener.
+		NewShortener := shortener.NewGenerator()
+
+		// Generate a short URL from the long URL.
+		shortUrl := NewShortener.GenerateShortLink(longUrl)
+
+		// Save the short URL and the corresponding long URL in the store.
+		_, err := st.Db.Collection("urls").InsertOne(nil, map[string]string{"shortUrl": shortUrl, "originalUrl": longUrl})
+		if err != nil {
+			fmt.Printf("Error saving URL: %v", err)
+			c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Message: "Error saving URL",
+				Error:   err.Error(),
+			})
+			return
+		}
+
+		// Determine the protocol to use for the short URL.
+		host := c.Request.Host
+		protocol := "http"
+		if c.Request.TLS != nil {
+			protocol = "https"
+		}
+		// Respond with the short URL.
+		c.JSON(200, dto.UrlCreationResponse{
+			Message:  "Short URL created successfully",
+			ShortUrl: fmt.Sprintf("%s://%s/%s", protocol, host, shortUrl),
 		})
 		return
 	}
+
 	// Create a new URL shortener.
 	NewShortener := shortener.NewGenerator()
 
 	// Generate a short URL from the long URL.
-	shortUrl := NewShortener.GenerateShortLink(creationRequest.LongUrl)
+	shortUrl := NewShortener.GenerateShortLink(creationRequest.Url)
 
 	// Save the short URL and the corresponding long URL in the store.
-	err := store.StoreService.Save(shortUrl, creationRequest.LongUrl)
+	_, err := st.Db.Collection("urls").InsertOne(nil, map[string]string{"shortUrl": shortUrl, "originalUrl": creationRequest.Url})
 	if err != nil {
 		fmt.Printf("Error saving URL: %v", err)
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Message: "Error saving URL",
 			Error:   err.Error(),
 		})

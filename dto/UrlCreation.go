@@ -3,7 +3,7 @@ package dto
 // UrlCreationRequest represents the request body for creating a short URL
 type UrlCreationRequest struct {
 	// The long URL to be shortened
-	LongUrl string `json:"long_url"binding:"required"`
+	Url string `json:"url"binding:"required"`
 }
 
 type UrlCreationResponse struct {

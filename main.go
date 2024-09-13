@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Dubjay18/Ushort/database"
 	"github.com/Dubjay18/Ushort/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -20,6 +21,9 @@ func getVars() {
 
 func main() {
 	getVars()
+	// Note that store initialization happens here
+	dbInstance := database.New("shorturl", "localhost", "27017")
+
 	r := gin.Default()
 	r.Use(CORS())
 	r.GET("/", func(c *gin.Context) {
@@ -27,15 +31,12 @@ func main() {
 	})
 
 	r.POST("/create", func(c *gin.Context) {
-		handler.CreateShortUrl(c)
+		handler.CreateShortUrl(c, dbInstance)
 	})
 
 	r.GET("/:shortUrl", func(c *gin.Context) {
 		handler.HandleShortUrlRedirect(c)
 	})
-
-	//// Note that store initialization happens here
-	//store.StoreService.Init()
 
 	err := r.Run(":3000")
 	if err != nil {
