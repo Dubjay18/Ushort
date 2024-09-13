@@ -26,7 +26,7 @@ func NewGenerator() *Generator {
 // GenerateShortLink method generates a short URL from the given initial URL.
 func (g *Generator) GenerateShortLink(initialLink string) string {
 	// Generate a SHA-256 hash of the initial URL.
-	urlHashBytes := sha256Of(initialLink + "jay")
+	urlHashBytes := sha256Of(initialLink + "u-short")
 	// Convert the hash to a big integer and then to a uint64.
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 	// Base58 encode the uint64 to get a string.

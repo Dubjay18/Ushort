@@ -23,9 +23,7 @@ func main() {
 	getVars()
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Welcome to the U-Short API",
-		})
+		handler.IndexPageHandler(c)
 	})
 
 	r.POST("/create", func(c *gin.Context) {

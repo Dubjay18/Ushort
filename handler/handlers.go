@@ -6,9 +6,20 @@ import (
 	"github.com/Dubjay18/Ushort/dto"
 	shortener "github.com/Dubjay18/Ushort/shortner"
 	"github.com/Dubjay18/Ushort/store"
+	"github.com/Dubjay18/Ushort/views"
+	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
+func render(ctx *gin.Context, status int, template templ.Component) error {
+	ctx.Status(status)
+	return template.Render(ctx.Request.Context(), ctx.Writer)
+}
+
+func IndexPageHandler(c *gin.Context) {
+	render(c, http.StatusOK, views.Index())
+}
 
 // CreateShortUrl is a handler function that creates a short URL from a given long URL.
 func CreateShortUrl(c *gin.Context) {
