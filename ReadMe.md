@@ -1,8 +1,8 @@
-
+<img src="./views/images/ushort.png" height="400px" width="400px" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 5px;"/>
 
 # Ushort
 
-Ushort is a URL shortening service written in Go. It uses Redis as a cache to store the short URL and original URL.
+Ushort is a URL shortening service written in Go. It uses Mongodb to store the short URL and original URL.
 
 ## Getting Started
 
@@ -11,23 +11,30 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - Go
-- Redis
+- Mongodb
 
 ### Installing
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/Dubjay18/Ushort.git
 ```
+
 2. Navigate to the project directory
+
 ```bash
 cd Ushort
 ```
+
 3. Install the dependencies
+
 ```bash
 go mod download
 ```
+
 4. Start the application
+
 ```bash
 go run main.go
 ```
@@ -48,5 +55,4 @@ go test ./...
 
 ## Authors
 
-- **Dubjay18** - *Initial work* - [Dubjay18](https://github.com/Dubjay18)
-
+- **Dubjay18** - _Initial work_ - [Dubjay18](https://github.com/Dubjay18)
